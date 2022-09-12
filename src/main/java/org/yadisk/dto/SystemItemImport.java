@@ -1,8 +1,15 @@
 package org.yadisk.dto;
 
+import org.yadisk.entity.SystemItem;
 import org.yadisk.entity.SystemItemType;
 
-import java.util.UUID;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import java.io.Serializable;
 
-public record SystemItemImport(UUID id, UUID parentId, SystemItemType type, String url, Integer size) {
+/**
+ * A DTO for the {@link SystemItem} entity
+ */
+public record SystemItemImport(@NotBlank String id, String parentId, @NotNull SystemItemType type, String url,
+                               Integer size) implements Serializable {
 }

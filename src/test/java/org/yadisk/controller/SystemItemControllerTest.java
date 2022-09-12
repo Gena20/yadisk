@@ -29,7 +29,7 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.standal
 @RunWith(SpringRunner.class)
 @WebMvcTest
 public class SystemItemControllerTest {
-    public static final UUID rootId = UUID.randomUUID();
+    public static final String rootId = UUID.randomUUID().toString();
 
     @Autowired
     private MockMvc mvc = standaloneSetup(new SystemItemController())
@@ -39,7 +39,7 @@ public class SystemItemControllerTest {
     public static String[] validData() throws JsonProcessingException {
         var objectMapper = (new ObjectMapper()).registerModule(new JavaTimeModule());
         var rootItem = new SystemItemImport(rootId, null, SystemItemType.FOLDER, null, null);
-        var item = new SystemItemImport(UUID.randomUUID(), rootId, SystemItemType.FILE, "/some/path", 10);
+        var item = new SystemItemImport(UUID.randomUUID().toString(), rootId, SystemItemType.FILE, "/some/path", 10);
 
         var request = new SystemItemImportRequest(Arrays.asList(rootItem, item), ZonedDateTime.now());
 
