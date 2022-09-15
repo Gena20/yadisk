@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity-mappings
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        version="2.1"
+        xmlns="http://xmlns.jcp.org/xml/ns/persistence/orm"
+        xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence/orm
+            http://xmlns.jcp.org/xml/ns/persistence/orm_2_1.xsd">
+    <package>org.yadisk.entity</package>
+
+    <named-native-query name="getAllChildren" result-set-mapping="SystemItemResult">
+        <query><![CDATA[
+            WITH RECURSIVE r (id, parent_id, type, size, url, date, level) AS
+            -- Initial Subquery
+            (SELECT id, parent_id, type, size, url, date, 1
+            FROM system_item
+            WHERE parent_id = :id
+            UNION ALL
+            -- Recursive Subquery
+            SELECT t.id, t.parent_id, t.type, t.size, t.url, t.date, r.level + 1
+            FROM r
+            INNER JOIN system_item t
+            ON r.id = t.parent_id)
+            -- Result Query
+            SELECT *
+            FROM r
+            ]]></query>
+        <hint name="org.hibernate.comment" value="Get Children By ID"/>
+    </named-native-query>
+
+    <named-native-query name="getAllParents" result-set-mapping="SystemItemResult">
+        <query><![CDATA[
+            WITH RECURSIVE r(id, parent_id, type, size, url, date, level) AS
+            -- Initial Subquery
+            (SELECT tr.id, tr.parent_id, tr.type, tr.size, tr.url, tr.date, 1
+            FROM system_item tl
+            LEFT JOIN system_item tr
+            ON tl.parent_id = tr.id
+            WHERE tl.id = :id
+            UNION ALL
+            -- Recursive Subquery
+            SELECT t.id, t.parent_id, t.type, t.size, t.url, t.date, level + 1
+            FROM system_item t, r
+            WHERE t.id = r.parent_id)
+            -- Result Query
+            SELECT id, parent_id, type, size, url, date, ROW_NUMBER() OVER (ORDER BY level DESC) AS level
+            FROM r
+            ]]></query>
+        <hint name="org.hibernate.comment" value="Get Parents By ID"/>
+    </named-native-query>
+
+    <named-native-query name="delete">
+        <query><![CDATA[
+            DELETE FROM system_item WHERE id = :id
+        ]]></query>
+        <hint name="org.hibernate.comment" value="Delete Node By ID"/>
+    </named-native-query>
+
+    <sql-result-set-mapping name="SystemItemResult">
+        <entity-result entity-class="org.yadisk.entity.SystemItem"/>
+        <column-result name="level" class="java.lang.Integer"/>
+    </sql-result-set-mapping>
+</entity-mappings>

@@ -10,14 +10,16 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.yadisk.dto.SystemItemImport;
 import org.yadisk.dto.SystemItemImportRequest;
 import org.yadisk.entity.SystemItemType;
+import org.yadisk.service.SystemItemService;
 
-import java.time.ZonedDateTime;
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.UUID;
 
@@ -31,17 +33,20 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.standal
 public class SystemItemControllerTest {
     public static final String rootId = UUID.randomUUID().toString();
 
+    @MockBean
+    private SystemItemService service;
+
     @Autowired
-    private MockMvc mvc = standaloneSetup(new SystemItemController())
+    private MockMvc mvc = standaloneSetup(new SystemItemController(service))
             .alwaysExpect(content().contentType(MediaType.APPLICATION_JSON))
             .build();
 
     public static String[] validData() throws JsonProcessingException {
         var objectMapper = (new ObjectMapper()).registerModule(new JavaTimeModule());
         var rootItem = new SystemItemImport(rootId, null, SystemItemType.FOLDER, null, null);
-        var item = new SystemItemImport(UUID.randomUUID().toString(), rootId, SystemItemType.FILE, "/some/path", 10);
+        var item = new SystemItemImport(UUID.randomUUID().toString(), rootId, SystemItemType.FILE, "/some/path", 10L);
 
-        var request = new SystemItemImportRequest(Arrays.asList(rootItem, item), ZonedDateTime.now());
+        var request = new SystemItemImportRequest(Arrays.asList(rootItem, item), Instant.now());
 
         return new String[]{objectMapper.writeValueAsString(request)};
     }
