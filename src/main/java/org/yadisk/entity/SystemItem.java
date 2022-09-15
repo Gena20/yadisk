@@ -10,7 +10,9 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.HashSet;
@@ -32,9 +34,11 @@ public class SystemItem implements Serializable {
     @Column(name = "type", nullable = false)
     private SystemItemType type;
 
+    @Min(1)
     @Column(name = "size")
     private Long size;
 
+    @Size(max = 255)
     @Column(name = "url")
     private String url;
 

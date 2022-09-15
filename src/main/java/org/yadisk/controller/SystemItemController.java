@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import org.yadisk.dto.SystemItemImportRequest;
 import org.yadisk.exception.SystemItemInvalidTypeException;
 import org.yadisk.exception.SystemItemNotFoundException;
+import org.yadisk.service.HistoryItemService;
 import org.yadisk.service.SystemItemService;
 
 import javax.validation.Valid;
@@ -16,23 +17,34 @@ import java.time.Instant;
 @RestController
 public class SystemItemController {
 
-    private final SystemItemService service;
+    private final SystemItemService systemItemService;
+
+    private final HistoryItemService historyItemService;
 
     @PostMapping("/imports")
     public ResponseEntity<?> imports(@Valid @RequestBody SystemItemImportRequest request) throws SystemItemInvalidTypeException, SystemItemNotFoundException {
-        service.importItems(request);
+        systemItemService.importItems(request);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @GetMapping("/nodes/{id}")
     public ResponseEntity<?> nodes(@PathVariable String id) throws SystemItemNotFoundException {
-        return new ResponseEntity<>(service.getItemById(id), HttpStatus.OK);
+        return new ResponseEntity<>(systemItemService.getItemById(id), HttpStatus.OK);
     }
 
-    // TODO: change return type??
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<?> delete(@PathVariable String id, @RequestParam("date") Instant date) throws SystemItemNotFoundException {
-        service.deleteItemById(id, date);
+        systemItemService.deleteItemById(id, date);
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @GetMapping("/updates")
+    public ResponseEntity<?> updates(@RequestParam("date") Instant date) {
+        return new ResponseEntity<>(historyItemService.getFilesByDate(date), HttpStatus.OK);
+    }
+
+    @GetMapping("/node/{id}/history")
+    public ResponseEntity<?> nodeHistory(@PathVariable String id, @RequestParam("dateFrom") Instant dateFrom, @RequestParam("dateTo") Instant dateTo) throws SystemItemNotFoundException {
+        return new ResponseEntity<>(historyItemService.getHistoryOfFileByDates(id, dateFrom, dateTo), HttpStatus.OK);
     }
 }

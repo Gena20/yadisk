@@ -17,6 +17,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.yadisk.dto.SystemItemImport;
 import org.yadisk.dto.SystemItemImportRequest;
 import org.yadisk.entity.SystemItemType;
+import org.yadisk.service.HistoryItemService;
 import org.yadisk.service.SystemItemService;
 
 import java.time.Instant;
@@ -36,8 +37,11 @@ public class SystemItemControllerTest {
     @MockBean
     private SystemItemService service;
 
+    @MockBean
+    private HistoryItemService historyItemService;
+
     @Autowired
-    private MockMvc mvc = standaloneSetup(new SystemItemController(service))
+    private MockMvc mvc = standaloneSetup(new SystemItemController(service, historyItemService))
             .alwaysExpect(content().contentType(MediaType.APPLICATION_JSON))
             .build();
 

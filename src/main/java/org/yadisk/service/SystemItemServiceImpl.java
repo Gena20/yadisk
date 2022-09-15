@@ -1,20 +1,20 @@
 package org.yadisk.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.yadisk.dto.SystemItemImport;
 import org.yadisk.dto.SystemItemImportRequest;
 import org.yadisk.entity.SystemItem;
 import org.yadisk.entity.SystemItemType;
+import org.yadisk.event.HistoryItemEvent;
 import org.yadisk.exception.SystemItemInvalidTypeException;
 import org.yadisk.exception.SystemItemNotFoundException;
 import org.yadisk.mapper.SystemItemMapper;
 import org.yadisk.repository.SystemItemRepository;
 
 import java.time.Instant;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 @RequiredArgsConstructor
 @Service
@@ -24,8 +24,13 @@ public class SystemItemServiceImpl implements SystemItemService {
 
     private final SystemItemRepository repository;
 
+    private final ApplicationEventPublisher publisher;
+
+    Set<SystemItem> itemsToUpdate = new HashSet<>();
+
     @Override
     public void importItems(SystemItemImportRequest request) throws SystemItemInvalidTypeException, SystemItemNotFoundException {
+        itemsToUpdate = new HashSet<>();
         var importItems = request.items();
         var updateDate = request.updateDate();
 
@@ -34,6 +39,7 @@ public class SystemItemServiceImpl implements SystemItemService {
 
         handleImportItems(folders, updateDate);
         handleImportItems(files, updateDate);
+        itemsToUpdate.forEach(item -> publisher.publishEvent(new HistoryItemEvent(this, item)));
     }
 
     @Override
@@ -70,6 +76,8 @@ public class SystemItemServiceImpl implements SystemItemService {
                     updateParents(item, updateDate, importItem.getSize() - item.getSize());
                 }
             }
+
+            itemsToUpdate.add(item);
         }
 
         repository.flush();
@@ -98,17 +106,15 @@ public class SystemItemServiceImpl implements SystemItemService {
                 if (sizeDiff != null) {
                     parent.setSize(Optional.ofNullable(parent.getSize()).orElse(0L) + sizeDiff);
                 }
+                itemsToUpdate.add(parent);
             }
         });
     }
 
     private void changeParent(SystemItem item, String importParentId, Instant updateDate) throws SystemItemNotFoundException {
         Long size = item.getSize();
-        if (size != null) {
-            updateParents(item, updateDate, -size);
-        } else {
-            updateParents(item, updateDate, null);
-        }
+
+        updateParents(item, updateDate, Objects.isNull(size) ? null : -size);
         setParent(item, importParentId);
         updateParents(item, updateDate, size);
     }

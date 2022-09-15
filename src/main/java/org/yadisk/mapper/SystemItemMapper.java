@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
 import org.yadisk.dto.SystemItemImport;
+import org.yadisk.entity.HistoryItem;
 import org.yadisk.entity.SystemItem;
 import org.yadisk.entity.SystemItemType;
 import org.yadisk.exception.SystemItemInvalidTypeException;
@@ -35,5 +36,17 @@ public class SystemItemMapper {
         }
 
         return foundItem;
+    }
+
+    public HistoryItem toHistoryItem(SystemItem item) {
+        var historyItem = new HistoryItem();
+        historyItem.setId(item.getId());
+        historyItem.setType(item.getType());
+        historyItem.setParentId(item.getParentId());
+        historyItem.setSize(item.getSize());
+        historyItem.setDate(item.getDate());
+        historyItem.setUrl(item.getUrl());
+
+        return historyItem;
     }
 }
