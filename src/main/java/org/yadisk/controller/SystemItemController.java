@@ -44,7 +44,7 @@ public class SystemItemController {
     }
 
     @GetMapping("/node/{id}/history")
-    public ResponseEntity<?> nodeHistory(@PathVariable String id, @RequestParam("dateFrom") Instant dateFrom, @RequestParam("dateTo") Instant dateTo) throws SystemItemNotFoundException {
-        return new ResponseEntity<>(historyItemService.getHistoryOfFileByDates(id, dateFrom, dateTo), HttpStatus.OK);
+    public ResponseEntity<?> nodeHistory(@PathVariable String id, @RequestParam("dateStart") Instant dateStart, @RequestParam("dateEnd") Instant dateEnd) throws SystemItemNotFoundException {
+        return new ResponseEntity<>(historyItemService.getHistoryOfFileByDates(id, dateStart, dateEnd), HttpStatus.OK);
     }
 }
