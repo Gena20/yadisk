@@ -29,6 +29,6 @@ public class SystemItemImport {
     @AssertTrue
     public boolean isValid() {
         return type == SystemItemType.FILE && size != null && url != null
-                || size == null && url == null;
+                || type == SystemItemType.FOLDER && size == null && url == null;
     }
 }
