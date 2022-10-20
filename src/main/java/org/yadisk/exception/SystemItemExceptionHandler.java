@@ -12,12 +12,12 @@ public class SystemItemExceptionHandler {
     private static final String DEFAULT_NOT_FOUND_MSG = "Item not found";
     private static final String DEFAULT_VALIDATION_MSG = "Validation Failed";
 
-    @ResponseBody
-    @ExceptionHandler(Exception.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse handleBadRequestException() {
-        return new ErrorResponse(HttpStatus.BAD_REQUEST.value(), DEFAULT_VALIDATION_MSG);
-    }
+//    @ResponseBody
+//    @ExceptionHandler(Exception.class)
+//    @ResponseStatus(HttpStatus.BAD_REQUEST)
+//    public ErrorResponse handleBadRequestException() {
+//        return new ErrorResponse(HttpStatus.BAD_REQUEST.value(), DEFAULT_VALIDATION_MSG);
+//    }
 
     @ResponseBody
     @ExceptionHandler(SystemItemNotFoundException.class)
