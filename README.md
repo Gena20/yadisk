@@ -1,6 +1,6 @@
-# yadisk - REST API сервис, который позволяет пользователям загружать и обновлять информацию о файлах и папках
+# yadisk is a REST API service that allows users to upload and update information about files and folders
 
-## Настройка проекта
+## App settings
 
 ### App envs
 
@@ -19,7 +19,7 @@ POSTGRES_USER: <username>
 POSTGRES_PASSWORD: <password>
 ```
 
-## Запуск проекта
+## Start app
 
-`docker-compose build` - сборка образов  
-`docker-compose up` - запуск контейнеров
+`docker-compose build`
+`docker-compose up`
